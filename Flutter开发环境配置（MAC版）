@@ -1,0 +1,42 @@
+一、配置镜像
+
+打开命令终端，输入命令open ~/.bash_profile,打开bash_profile文本，添加镜像路径并保存
+export PUB_HOSTED_URL=https://pub.flutter-io.cn
+export FLUTTER_STORAGE_BASE_URL=https://flutter-io.cn
+（该路径会有变化，可以关注Flutter社区，随时更新）
+
+命令终端，输入命令source ~/.bash_profile,执行镜像配置生效
+二、配置flutterSDK
+
+flutter官网下载flutter SDK，放置在某个目录中（我放在Documents目录下）
+将sdk路径录入到bash_profile中，输入命令open ~/.bash_profile,打开bash_profile文本，添加sdk文件路径并保存
+export PATH=~/Documents/fluttersdk/bin:$PATH
+Documents为目录，fluttersdk为sdk文件夹
+
+三、通过命令终端执行项目工程
+
+cd到对应的项目工程中执行命令：
+
+flutter emulators // 查看当前模拟器
+flutter emulator --launch apple_ios_simulator -  // 启动模拟器
+flutter run // 执行项目工程，若有多个设备连接，需要 -d <设备的id>执行某个模拟器
+四、查看Android和iOS的依赖是否缺失
+
+在终端中执行flutter doctor查看Android和iOS的开发环境，监测到依赖若有缺失，会给出缺失的依赖的安装结果，依照提示进行安装即可。
+
+五、iOS工具链配置-可运行在iOS真机设备中
+
+在命令终端执行相关命令：
+
+brew update
+brew install --HEAD usbmuxd  // usbmuxd是一个与iOS设备建立多路通信连接的socket守护进程，通过它，可以将USB通信抽象为TCP通信
+brew link usbmuxd
+brew install --HEAD libimobiledevice // libimobiledevice是一个与iOS设备进行通信的跨平台协议库
+brew install ideviceinstaller // ideviceinstaller 是一个使用他们在iOS设备上管理APP的工具
+六、Android工具链配置
+
+打开Android Studio应用，打开菜单项Preferences > Plugins中搜索Flutter插件并点击install进行安装
+
+七、VS Code配置
+
+打开 VS Code，可点击 View -> Command Palette，搜索flutter并点击install进行安装
