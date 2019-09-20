@@ -1,0 +1,42 @@
+Dart执行入口
+
+Dart要求以main函数作为执行的入口
+
+Dart的变量和类型
+
+在Dart中可以用var或者具体的类型来声明一个变量。当使用var定义变量时，表示类型是由编译器推断决定。使用静态类型去定义变量时，编辑器和编译器可以提供代码补全或编译警告的提示。
+在默认情况下，未初始化的变量的值都是null。
+Dart是类型安全的语言，并且所有类型都是对象类型，都继承自顶层类型Object，因此一切变量的值都是类的实例（即对象），甚至数字、布尔值、函数和null也都是继承自Object的对象。
+num、bool与String
+
+Dart的数值类型num，有两个子类，即int（整数类型）和double（浮点数类型），基本运算符、求绝对值和取整等功能也继承自num类型。
+其他高级运算方法，可以尝试dart：math库，该库提供来诸如三角函数、指数、对数、平方根等高级函数。
+Dart的bool类型，只有两个对象具有bool类型：true和false，它们都是编译时常量
+Dart是类型安全的，因此不能使用if(nonbooleanValue)或assert(nonbooleanValue)之类的在JavaScript可以正常工作的代码，而应该显示地检查值
+Dart的String由UTF-16的字符串组成。构造字符串字面量时既能使用单引号也能使用双引号，还能在字符串中嵌入变量和表达式：可以使用${express}把一个表达式的值放进字符串。如果是一个标识符，可以省略{}.
+Dart调用对象的toString()方法获取对象的字符串。使用**“+”拼接字符串**。
+对于多行字符串的构建，可以通过三个单引号或三个双引号的方式声明。
+List与Map
+
+其他编程语言中常见的数组和字典类型，在Dart中的对应实现是List和Map，统称为集合类型。
+
+  var arr1 = <String>["Tom","Andy", "Jack"];
+  var arr2 = new List.of([1,2,3]);
+  arr2.add(499);
+  arr2.forEach((v) => print('${v}'));
+  print(arr2 is List<int>); // true
+
+  var map1 = <String, String>{'name':'Tom','sex':'male'};
+  var map2 = new Map<String, String>();
+  map2['name'] = 'Tom';
+  map2['sex'] = 'male';
+  map2.forEach((k,v) => print('${k}: ${v}'));
+  print(map2 is Map<String, String>); // true
+容器中的元素需要类型一致，可以添加类型约束，让静态分析器帮忙检查字面量中的错误
+
+常量定义
+
+定义不可变的变量，需要在定义变量前加上 final 或 const 关键字：
+
+const，表示变量在编译期间即能确定的值；
+final定义的变量可以在运行时确定值，而一点确定后就不可再变。
