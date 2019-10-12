@@ -1,0 +1,269 @@
+文本控件
+
+Text 支持两种类型的文本展示，一个是默认的展示单一样式文本 Text，另一个是支持多种混合样式的富文本 Text.rich。
+
+单一样式文本 Text
+
+单一样式文本 Text 的初始化，是要传入需要展示的字符串。而这个字符串的具体展示效果，受构造函数中的其他参数控制。这些参数大致可以分为两类：
+
+控制整体文本布局的参数，如文本对齐方式 textAlign、文本排版方向 textDirection，文本显示最大行数 maxLines、文本截断规则 overflow 等等，这些都是构造函数中的参数；
+控制文本展示样式的参数，如字体名称 fontFamily、字体大小 fontSize、文本颜色 color、文本阴影 shadows 等等，这些参数被统一封装到构造函数中的参数 style 中。
+示例代码 - 定义了一段剧中布局、20号红色粗体展示样式的字符串：
+
+Text(
+    '文本是视图系统中的常见空间，用来显示一段特定样式的字符串，就比如 Android 里的 TextView，或是 iOS 中的 UILabel。',
+    textAlign: TextAlign.center, // 居中显示
+    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.red),// 20 号，红色粗体展示
+);
+支持多种混合样式的富文本 Text.rich
+
+混合展示样式与单一样式的关键区别在于分片，即如何把一段字符串分为几个片段来管理，给每个片段单独设置样式。在 Flutter 中可以使用 TextSpan。
+
+TextSpan 定义来一个字符串片段该如何控制其展示样式，而将这些有着独立展示样式的字符串组装在一起，则可以支持混合样式的富文本展示。
+
+示例代码 - 分别定义黑色与红色两种展示样式
+
+TextStyle blackStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 20, color: Colors.black); // 黑色样式
+    TextStyle redStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.red); // 红色样式
+    Text.rich(
+      TextSpan(
+        children: <TextSpan>[
+          TextSpan(text: '文本是视图系统中的常见空间，用来显示一段特定样式的字符串，就比如', style: redStyle), // 第 1 个片段，红色样式
+          TextSpan(text: 'Android', style: blackStyle), // 第 1 个片段，黑色样式
+          TextSpan(text: '中的', style: redStyle), // 第 1 个片段，红色样式
+          TextSpan(text: 'TextView', style: blackStyle), // 第 1 个片段，黑色样式
+        ]
+      ),
+    textAlign: TextAlign.center,
+);
+图片
+
+在 Flutter 中有多张方式，用来加载不同形式、支持不同格式的图片：
+
+加载本地资源图片，如 Image.asset('images/log.png');
+加载本地（File 文件）图片，如 Image.file(new File('/storage/xxx/xxx/test.jpg'));
+加载网络图片，如 Image.network('http://xxx/xxx/test.gif')。
+除了可以根据图片的显示方式设置不同的图片源之外，图片的构造方法还提供了填充模式 fit、拉伸模式 centerSlice、重复模式 repeat 等属性，可以针对图片与目标区域的宽高比差异制定排版模式。
+
+FadeInImage 控件
+
+在加载网络图片的时候，为了提升用户的等待体验，往往会加入占位图、加载动画等元素，但是默认的 Image.network 构造方法并不支持这些高级功能，这时候 FadeInImage 控件就派上用场了。
+
+FadeInImage 控件提供了图片占位的功能，并且支持在图片加载完成时淡入淡出的视觉效果。此外，由于 Image 支持 gif 格式，甚至还可以将一些炫酷的加载动画作为占位图。
+
+示例代码 - loading 的 gif 作为占位图展示：
+
+FadeInImage.assetNetwork(
+    placeholder: 'asssets/loading.gif', // gif 占位
+    image: 'https://xxx/xxx/xxx.jpg',
+    fit: BoxFit.cover, // 图片拉伸模式
+    width: 200,
+    height: 200,
+);
+Image 控件需要根据图片资源异步加载的情况，决定自身的显示效果，因此是一个 StatefulWidget。图片加载过程由 ImageProvider 触发，而 ImageProvider 表示异步获取图片数据的操作，可以从资源、文件和网络等不同的渠道获取图片。
+
+首先，ImageProvider 根据 _imageSate 中传递的图片配置生成对应的图片缓存 key；然后，去 ImageCache 中查找是否有对应的图片缓存，如果有，则通知 _ImageState 刷新 UI；如果没有，则启动 ImageStream 开始异步加载，加载完毕后，更新缓存；最后通知 _imageSate 刷新 UI。
+
+值得注意的是，ImageCache 使用 LRU（Least Recently Used，最近最少使用）算法进行缓存更新策略，并且默认最多存储 1000 张图片，最大缓存限制为 100 MB，当限定的空间已经存满数据时，把最久没有被访问到的图片清除。图片 缓存只会在运行期间生效，也就是只缓存在内存中。如果想要支持缓存到文件系统，可以使用第三方的 CachedNetworkImage 控件。
+
+按钮
+
+通过按钮，可以相应用户的交互事件。Flutter 提供了三个基本的按钮空间，即 FloatingActionButton、FlatButton 和 RaisedButton。
+
+FloatingActionButton：一个圆形的按钮，一般出现在屏幕内容的前面，用来处理界面中最常用、最基础的用户动作。
+RaisedButton：凸起的按钮，默认带有灰色背景，被点击后灰色背景会加深。
+FlatButton：扁平化的按钮，默认透明背景，被点击后呈现灰色背景。
+既然是按钮，因此除了控制基本样式之外，还需要响应用户点击行为。这就对应着按钮空间中的两个最重要的参数：
+
+onPressed 参数用于设置点击回调，告诉 Flutter 在按钮被点击时通知我们。如果 onPressed 参数为空，则按钮会处于禁用状态，不响应用户点击。
+child 参数用于设置按钮的内容，告诉 Flutter 控件应该长成什么样，也就是控制着按钮控件的基本样式。child 可以接收任意的 Widget。
+除此之外，还可以进行样式定制（以 FlatButton 为例）：
+
+FlatButton(
+    color: Colors.yellow, // 设置背景色为黄色
+    shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(20.0)), // 设置斜角矩形边框
+    colorBrightness: Brightness.light, // 确保文字按钮为深色
+    onPressed: () => print('FlatButton pressed'),
+    child: Row(children: <Widget>[Icon(Icons.add), Text("Add")],),
+);
+ListView
+
+若相关基本元素的排列布局超过屏幕显示尺寸（即超过一屏）时，就需要引入列表控件来展示视图的完整内容，并根据元素的多少进行自适应滚动展示。
+
+这样的需求，在 Android 中是由 ListView 或 RecyclerView 实现的，在 iOS 中是用 UITableView 实现的；而在 Flutter 中，实现这种需求的则是列表空间 ListView。
+
+在 Flutter 中，ListView 可以沿着一个方向（垂直或水平方向）来排列其所有子 Widget，因此常用于需要展示一组连续视图元素的场景，比如通讯录、优惠劵、商家列表等。
+
+ListView 提供了一个默认构造函数 ListView，可以通过设置它的 children 参数，很方便地将所有的子 Widget 包含到 ListView 中。
+
+但是，这种创建方式要求提前将所有的子 Widget 一次性创建好，而不是等到它们真正在屏幕上需要显示时才创建，所以有一个很明显的缺点，就是性能不好。因此，这种方式仅适用于列表中含有少量元素的场景。
+
+ListView(
+    scrollDirection: Axis.horizontal, // 设置滚动方向
+    children: <Widget>[
+        // 设置 ListTile 组件的标题与图标
+        ListTile(leading: Icon(Icons.map), title: Text('Map'),),
+        ListTile(leading: Icon(Icons.mail), title: Text('Mail'),),
+        ListTile(leading: Icon(Icons.message), title: Text('Message'),),
+    ],
+);
+**ListView 的另外一个构造函数 ListView.builder，则适用于子 Widget 比较多的场景。这个构造函数有两个关键参数：
+
+itemBuilder，是列表项的创建方法。当列表滚动到相应位置时，ListView 会调用该方法创建对应的子 Widget。
+itemCount，表示列表项的数量，如果为空，则表示 ListView 为无限列表。
+具体用法如下，定义一个拥有 100 个列表元素的 ListView：
+
+ListView.builder(
+    itemCount: 100, // 元素个数
+    itemExtent: 50.0, // 列表项高度
+    itemBuilder: (BuildContext context, int index) => ListTile(title: Text("title $index"), subtitle: Text("body $index"),),
+);
+需要注意的是，itemExtent并不是一个必填参数。但，对于定高的列表项元素，强烈建议提前设置好这个参数的值。
+
+因为如果这个参数为 null，ListView 会动态地根据子 Widget 创建完成的结果，决定自身的视图高度，以及子 Widget 在 ListView 中的相对位置。在滚动发生变化而列表项又很多时，这样的计算就会非常频繁。
+
+在 ListView 中，有两种方式支持分割线：
+
+一种是，在 itemBuilder 中，根据 index 的值动态创建分割线，也就是将分割线视为列表项的一部分；
+另一种是，使用 ListView 的另一个构造方法 ListView.separated，单独设置分割线的样式。
+总结 ListView 常见的构造方法及适用场景如下：
+
+构造函数名	特点	适用场景	使用频次
+ListView	一次性创建好全部子 Widget	适用于展示少量连续子 Widget 的场景	中
+List.builder	提供了子 Widget 创建方法，仅在需要展示时才创建	适用于子 Widget 较多，且视觉效果呈现某种规律性的场景	高
+ListView.separated	与 ListView.builder 类似，并提供了自定义分割线的功能	与 ListView.builder 场景类似	中
+CustomScrollView
+
+ListView 实现了单一视图下可滚动 Widget 的交互模式，同时也包含了 UI 显示相关的控制逻辑和布局模型。但是，对于某些特殊交互场景，比如多个效果联动、嵌套滚动、精细滑动、视图跟随手势操作等，还需要嵌套多个 ListView 来实现。这时，各自视图的滚动和布局模型就是相互独立、分离的，就很难保证整个页面统一一致的滑动效果。
+
+在 Flutter 中有一个专门的控件 CustomScrollView，用来处理多个需要自定义滚动效果的 Widget。在 CustomScrollView 中，这些彼此独立的、可滚动的 Widget 被统称为 Sliver。
+
+比如，ListView 的 Sliver 实现为 SliverList，AppBar 的 Sliver 实现为 SliverAppBar。这些 Sliver 不再维护各自的滚动状态，而是交由 CustomScrollView 统一管理，最终实现滑动效果的一致性。
+
+可以通过一个滚动视差的例子，演示 CustomScrollView 的使用方法。
+
+视差滚动是指让多层背景以不同的速度移动，在形成立体滚动效果的同时，还能保证良好的视觉体验。作为移动应用交互设计的热点趋势，越来越多的移动应用使用来这项技术。
+
+以一个有着封面头图的列表为例，封面头图和列表这两层视图的滚动联动起来，当用户滚动列表时，头图会根据用户的滚动手势，进行缩小和展开。
+
+经过分析得出，要实现这样的需求，需要两个 Sliver：作为头图的 SliverAppBar，作为列表的 SliverList。思路如下：
+
+在创建 SliverAppBar 时，把 flexibleSpace 参数设置为悬浮头图背景。flexibleSpace 可以让背景图显示在 AppBar 下方，高度和 SliverAppBar 一样；
+而在创建 SliverList 时，通过 SliverChildBuilderDelegate 参数实现列表项元素的创建；
+最后，将它们一并交由 CustomScrollView 的 slivers 参数统一管理。
+具体的示例代码如下：
+
+    CustomScrollView (
+      slivers: <Widget>[
+        SliverAppBar( // SliverAppBar 作为头图控件
+          title: Text('CustomScrollView Demo'), // 标题
+          floating: true, // 设置悬浮样式
+          flexibleSpace: Image.network("https://xx.jpg", fit: BoxFit.cover,), // 设置悬浮头图背景
+          expandedHeight: 300, // 头图控件高度
+        ),
+        SliverList( // SliverList 作为列表控件
+          delegate: SliverChildBuilderDelegate(
+              (context, index) => ListTile(title: Text('Item #$index'),), //列表项创建方法
+              childCount: 100, // 列表元素个数
+          ),
+        )
+      ],
+    );
+ScrollController 与 ScrollNotification
+
+使用 ScrollController 进行滚动信息的监听，以及相应的滚动控制；ScrollNotifiCation 通知进行滚动事件的获取。
+
+在 Flutter 中，因为 Widget 并不是渲染到屏幕的最终视觉元素（RenderObject 才是），所以无法像原生的 Android 或 iOS 系统那样，向持有的 Widget 对象获取或者设置最终渲染相关的视觉信息，而必须通过对应的组件控制器才能实现。
+
+ListView 的组件控制器则是 ScrollController，我们可以通过它来获取视图的滚动信息，更新视图的滚动位置。
+
+一般而言，获取视图的滚动信息往往是为了进行界面的状态控制，因此 ScrollController 的初始化、监听及销毁需要与 StatefulWidget 的状态保持同步。
+
+代码示例所示，声明一个有着 100 个元素的列表项，当滚动视图到特定位置后，用户可以点击按钮返回列表顶部：
+
+首先，在 State 的初始化方法里，创建了 ScrollController，并通过 _controller.addListener 注册了滚动监听方法回调，根据当前视图的滚动位置，判断当前是否需要展示“Top”按钮。
+随后，在视图构建方法 build 中，将 ScrollController 对象与 ListView 进行了关联，并且在 RaisedButton 中注册了对应的回调方法，可以在点击按钮时通过 _controller.animateTo 方法返回列表顶部。
+最后，在 State 的销毁方法中，对 ScrollController 进行了资源释放。
+class _MyAppState extends State<MyApp> {
+
+  ScrollController _controller; // ListView 控制器
+  bool isToTop = false; // 标示目前是否需要启用 "Top" 按钮
+  @override
+  void initState() {
+
+    _controller = ScrollController();
+    _controller.addListener(() { // 为控制器注册滚动监听方法
+
+      if (_controller.offset > 1000) { // 如果 ListView 已经向下滚动了 1000，则启用 Top 按钮
+        setState(() {
+          isToTop = true;
+        });
+      }
+      else if (_controller.offset < 300) { // 如果 ListView 向下滚动距离不足 300，则禁用 Top 按钮
+        setState(() {
+          isToTop = false;
+        });
+        super.initState();
+      }
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Scroll Controller Widget"),),
+      body: Column(
+        children: <Widget>[
+          Container(
+            height: 40.0,
+            child: RaisedButton(onPressed: (isToTop ? () {
+              if (isToTop) {
+                _controller.animateTo(.0, duration: Duration(milliseconds: 200), curve: Curves.ease);
+              }
+            } : null), child: Text("Top"),),
+          ),
+          Expanded(
+            child: ListView.builder(
+                controller: _controller, // 初始化传入控制器
+                itemCount: 100, // 列表元素总和
+                itemBuilder: (context, index) => ListTile(title: Text("Index : $index"),) // 列表项构造方法
+            ),
+          )
+        ],
+      ),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose(); // 销毁控制器
+    super.dispose();
+  }
+}
+在 Flutter 中， ScroNotification 通知的获取是通过 NotificationListener 来实现的。与 ScrollController 不同的是，NotificationListener 是一个 Widget，为了监听滚动类型的事件，我们需要将 NotificationListener 添加为 ListView 的父容器，从而捕获 ListView 中的通知。而这些通知，需要通过 onNotification 回调函数实现监听逻辑：
+
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'ScrollController Demo',
+      home: Scaffold(
+        appBar: AppBar(title: Text('ScrollController Demo')),
+        body: NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollStartNotification) { // 开始滚动
+              
+            }
+            else if ( scrollNotification is ScrollUpdateNotification) { // 滚动位置更新
+
+            }
+            else if (ScrollStartNotification is ScrollEndNotification) { // 滚动结束
+              
+            }
+          }, 
+            child: ListView.builder(itemBuilder: (context, index) => ListTile(title: Text("Index : $index"),));
+        ), 
+          
+      ),
+        
+    );
+    
+  }
+相比于 ScrollController 只能和具体的 ListView 关联后才可以监听到滚动信息；通过 NotificationListener 则可以监听其子 Widget 中的任意 ListView，不仅可以得到这些 ListView 的当前滚动位置信息，还可以获取当前的滚动事件信息。
